@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Play Tic-Tac-Toe against a friend or challenge the unbeatable AI. Premium design with animations, sound effects, and game statistics." />
+  <title>TicTacPro — Tic-Tac-Toe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Animated background -->
+  <div class="bg" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+    <div class="grid-lines"></div>
+  </div>
+
+  <main class="app" id="app" role="main">
+
+    <!-- ── Header ──────────────────────────────── -->
+    <header class="header anim-entrance" style="--delay:0">
+      <div class="logo">
+        <div class="logo-mark logo-x-mark">
+          <span class="lx lx-1"></span>
+          <span class="lx lx-2"></span>
+        </div>
+        <span class="logo-title">TicTacPro</span>
+        <div class="logo-mark logo-o-mark">
+          <span class="lo"></span>
+        </div>
+      </div>
+      <p class="tagline">Outsmart · Outplay · Win</p>
+    </header>
+
+    <!-- ── Top Controls Bar ─────────────────────── -->
+    <div class="controls-bar anim-entrance" style="--delay:1">
+      <div class="mode-selector" id="modeSelector" aria-label="Game mode">
+        <button class="mode-btn active" id="modePvP" data-mode="pvp" aria-pressed="true">
+          <span class="mode-icon">👥</span>
+          <span class="mode-label">2 Players</span>
+        </button>
+        <button class="mode-btn" id="modePvC" data-mode="pvc" aria-pressed="false">
+          <span class="mode-icon">🤖</span>
+          <span class="mode-label">vs Computer</span>
+        </button>
+      </div>
+      <button class="icon-btn" id="muteBtn" aria-label="Toggle sound" title="Toggle Sound">
+        <svg class="sound-icon" id="soundIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <path class="sound-wave sound-w1" d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          <path class="sound-wave sound-w2" d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- ── Difficulty (shown only in PvC mode) ──── -->
+    <section class="difficulty-selector hidden anim-entrance" id="difficultySelector" style="--delay:1" aria-label="AI difficulty">
+      <button class="diff-btn active" id="diffEasy"   data-diff="easy"   aria-pressed="true">🟢 Easy</button>
+      <button class="diff-btn"       id="diffHard"   data-diff="hard"   aria-pressed="false">🟡 Hard</button>
+      <button class="diff-btn"       id="diffUnbeat" data-diff="unbeat" aria-pressed="false">🔴 Unbeatable</button>
+    </section>
+
+    <!-- ── Status Banner ──────────────────────────── -->
+    <div class="status-banner anim-entrance" id="statusBanner" style="--delay:2" role="status" aria-live="polite">
+      <span class="status-dot" id="statusDot"></span>
+      <span class="status-icon" id="statusIcon">✕</span>
+      <span class="status-text" id="statusText">Player X's turn</span>
+      <span class="move-counter" id="moveCounter">Move 1/9</span>
+    </div>
+
+    <!-- ══════════ GAME AREA (Board + Sidebar) ══════════ -->
+    <div class="game-area anim-entrance" style="--delay:3">
+
+      <!-- LEFT: Game Board -->
+      <section class="board-wrapper" aria-label="Game board">
+        <div class="board" id="board" role="grid" aria-label="Tic-Tac-Toe grid">
+          <button class="cell" id="cell-0" data-index="0" aria-label="Row 1, Column 1" aria-pressed="false"></button>
+          <button class="cell" id="cell-1" data-index="1" aria-label="Row 1, Column 2" aria-pressed="false"></button>
+          <button class="cell" id="cell-2" data-index="2" aria-label="Row 1, Column 3" aria-pressed="false"></button>
+          <button class="cell" id="cell-3" data-index="3" aria-label="Row 2, Column 1" aria-pressed="false"></button>
+          <button class="cell" id="cell-4" data-index="4" aria-label="Row 2, Column 2" aria-pressed="false"></button>
+          <button class="cell" id="cell-5" data-index="5" aria-label="Row 2, Column 3" aria-pressed="false"></button>
+          <button class="cell" id="cell-6" data-index="6" aria-label="Row 3, Column 1" aria-pressed="false"></button>
+          <button class="cell" id="cell-7" data-index="7" aria-label="Row 3, Column 2" aria-pressed="false"></button>
+          <button class="cell" id="cell-8" data-index="8" aria-label="Row 3, Column 3" aria-pressed="false"></button>
+        </div>
+        <svg class="win-line-svg" id="winLineSvg" aria-hidden="true" viewBox="0 0 3 3" preserveAspectRatio="none">
+          <line id="winLine" class="win-line" x1="0" y1="0" x2="0" y2="0" />
+        </svg>
+      </section>
+
+      <!-- RIGHT: Sidebar Panel -->
+      <aside class="sidebar" aria-label="Game info panel">
+
+        <!-- Scoreboard -->
+        <div class="sidebar-section">
+          <h3 class="sidebar-heading">Scoreboard</h3>
+          <div class="sidebar-scores">
+            <div class="side-score" id="scoreX">
+              <div class="side-score-top">
+                <div class="css-x small"><span></span><span></span></div>
+                <input type="text" class="score-name" id="nameX" value="Player X" aria-label="Player X Name" maxlength="12">
+              </div>
+              <div class="side-score-value" id="scoreXVal">0</div>
+            </div>
+            <div class="side-score draw-score">
+              <div class="side-score-top">
+                <div class="score-mark draw-mark">—</div>
+                <div class="score-label">Draws</div>
+              </div>
+              <div class="side-score-value" id="scoreDrawVal">0</div>
+            </div>
+            <div class="side-score" id="scoreO">
+              <div class="side-score-top">
+                <div class="css-o small"></div>
+                <input type="text" class="score-name" id="nameO" value="Player O" aria-label="Player O Name" maxlength="12">
+              </div>
+              <div class="side-score-value" id="scoreOVal">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="sidebar-divider"></div>
+
+        <!-- Game Stats -->
+        <div class="sidebar-section">
+          <h3 class="sidebar-heading">Statistics</h3>
+          <div class="sidebar-stats">
+            <div class="side-stat">
+              <span class="side-stat-val" id="statTotalGames">0</span>
+              <span class="side-stat-lbl">Games</span>
+            </div>
+            <div class="side-stat">
+              <span class="side-stat-val" id="statWinRate">0%</span>
+              <span class="side-stat-lbl">X Win Rate</span>
+            </div>
+            <div class="side-stat">
+              <span class="side-stat-val" id="statStreak">0</span>
+              <span class="side-stat-lbl">Win Streak</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="sidebar-divider"></div>
+
+        <!-- Actions -->
+        <div class="sidebar-section sidebar-actions">
+          <button class="action-btn undo-btn" id="undoBtn" aria-label="Undo last move" disabled>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            Undo
+          </button>
+          <button class="action-btn reset-btn" id="resetBtn" aria-label="New game">
+            ↺ New Game
+          </button>
+          <button class="action-btn clear-btn" id="clearBtn" aria-label="Clear scores">
+            Clear All
+          </button>
+        </div>
+
+        <!-- Keyboard Hints -->
+        <div class="sidebar-keys">
+          <kbd>R</kbd> restart · <kbd>Z</kbd> undo · <kbd>Enter</kbd> play
+        </div>
+
+      </aside>
+
+    </div>
+    <!-- ══════════ END GAME AREA ══════════ -->
+
+    <!-- ── Win Modal ────────────────────────────── -->
+    <div class="modal-overlay hidden" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal">
+        <div class="modal-glow" id="modalGlow"></div>
+        <div class="modal-emoji" id="modalEmoji">🎉</div>
+        <h2 class="modal-title" id="modalTitle">Player X Wins!</h2>
+        <p class="modal-sub" id="modalSub">Excellent move!</p>
+        <div class="modal-stats" id="modalStats"></div>
+        <div class="modal-actions">
+          <button class="action-btn reset-btn" id="modalPlayAgain">↺ Play Again</button>
+          <button class="action-btn clear-btn" id="modalClose">Close</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
